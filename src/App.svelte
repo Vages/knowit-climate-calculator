@@ -217,7 +217,7 @@
 					<strong>
 						Måneder i året der du gikk eller syklet
 						<em>alle</em>
-						arbeidsdager
+						arbeidsdager.
 					</strong>
 				</label>
 			</div>
@@ -233,7 +233,7 @@
 			</div>
 
 			<label for="used_vacation_days">
-				<strong>Antall feriedager du tok ut</strong>
+				<strong>Antall feriedager du tok ut.</strong>
 				5 uker ferie er 25 dager.
 			</label>
 			<div>
@@ -244,19 +244,6 @@
 					step="1"
 					min="0"
 					max="" />
-			</div>
-
-			<label for="unplanned_absence_days">
-				<strong>Dager i året du var uplanlagt borte</strong>
-				Sykdom eller hjemmekontor på kort varsel.
-			</label>
-			<div>
-				<input
-					id="unplanned_absence_days"
-					type="number"
-					bind:value={unplanned_absence_days}
-					step="1"
-					min="0" />
 			</div>
 
 			<label for="days_in_office_every_four_weeks">
@@ -273,6 +260,20 @@
 					min="0"
 					max="20" />
 			</div>
+
+			<label for="unplanned_absence_days">
+				<strong>Dager i året du var uplanlagt borte.</strong>
+				Sykdom eller hjemmekontor på kort varsel.
+			</label>
+			<div>
+				<input
+					id="unplanned_absence_days"
+					type="number"
+					bind:value={unplanned_absence_days}
+					step="1"
+					min="0" />
+			</div>
+
 		</div>
 
 		<h3>Fordeling av kontordager</h3>
