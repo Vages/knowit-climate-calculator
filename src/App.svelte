@@ -71,7 +71,6 @@
 
 <style>
 	:root {
-		/* Color Theme Swatches in Hex */
 		--theme-green: #1d88e5;
 		--theme-purple: #6835d6;
 		--theme-black: #4a4f5f;
@@ -109,8 +108,8 @@
 	}
 
 	.content {
-		margin: 3rem auto;
-		padding: 3rem;
+		margin: 40px auto;
+		padding: 40px;
 		background: #ddd;
 		border-radius: 10px;
 		color: var(--theme-black);
@@ -122,8 +121,8 @@
 		display: grid;
 		grid-template-columns: repeat(2, auto);
 		grid-auto-flow: row;
-		grid-gap: 2rem;
-		margin: 2rem 0;
+		grid-gap: 20px;
+		margin: 20px 0;
 		align-items: center;
 	}
 
@@ -133,7 +132,7 @@
 	}
 
 	.ratio_display {
-		margin: 1rem 0;
+		margin: 10px 0;
 		display: flex;
 		text-align: center;
 	}
@@ -146,13 +145,13 @@
 
 	.ratio_display > *:first-child {
 		box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.25) inset;
-		border-top-left-radius: 0.75rem;
-		border-bottom-left-radius: 0.75rem;
+		border-top-left-radius: 8px;
+		border-bottom-left-radius: 8px;
 	}
 
 	.ratio_display > *:last-child {
-		border-top-right-radius: 0.75rem;
-		border-bottom-right-radius: 0.75rem;
+		border-top-right-radius: 8px;
+		border-bottom-right-radius: 8px;
 	}
 
 	.unmotorized {
@@ -183,7 +182,7 @@
 	}
 
 	.results {
-		margin: 4rem 0;
+		margin: 40px 0;
 	}
 
 	footer {
@@ -419,11 +418,9 @@
 				om du vil. Takk til Birgitte Rishatt for hjelp med fargevalg.
 			</p>
 			<p>
-				Hvis du jobber i Objectnet og synes Svelte er gøy, kan du bli med i
-				Slack gruppen #guild-svelte (send en
-				<a href="mailto:eirik.vageskar@knowit.no">e-post til Eirik</a>
-				om du ikke jobber i Objectnet, så legger han deg til). Og om du synes
-				klimaarbeid er gøy, kan du også bli med i #miljøgruppa.
+				Bli med i #guild-svelte på Slack (kontakt
+				<a href="mailto:eirik.vageskar@knowit.no">Eirik</a>
+				om du ikke jobber i Objectnet).
 			</p>
 		</footer>
 	</div>
