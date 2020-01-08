@@ -109,7 +109,7 @@
 
 	.content {
 		margin: 40px auto;
-		padding: 40px;
+		padding: 20px 40px;
 		background: #ddd;
 		border-radius: 10px;
 		color: var(--theme-black);
