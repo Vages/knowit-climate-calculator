@@ -6,6 +6,13 @@
 	const MAX_VACATION_DAYS = 25
 	const MAX_DAYS_EVERY_FOUR_WEEKS = 20
 
+	let kilometers_from_home_to_work = 2.6
+
+	let months_without_motorized_vehicles = 3
+	$: unmotorized_ratio = months_without_motorized_vehicles / 12
+
+	let used_vacation_days = MAX_VACATION_DAYS
+
 	let planned_home_office_days = 0
 
 	$: days_in_office_every_four_weeks =
@@ -14,24 +21,20 @@
 	$: in_office_ratio =
 		days_in_office_every_four_weeks / MAX_DAYS_EVERY_FOUR_WEEKS
 
-	let months_without_motorized_vehicles = 3
-	$: unmotorized_ratio = months_without_motorized_vehicles / 12
-	let kilometers_from_home_to_work = 2.6
-
-	let used_vacation_days = MAX_VACATION_DAYS
-
 	let unplanned_absence_days = 0
 
 	let rail_days = 0
 	let bus_days = 0
-	let car_days
 
 	const TWEENED_OPTIONS = { easing: cubicOut }
 
 	$: car_days = days_in_office_every_four_weeks - rail_days - bus_days
-	let rail_days_tweened = tweened(rail_days, TWEENED_OPTIONS)
-	let bus_days_tweened = tweened(bus_days, TWEENED_OPTIONS)
-	let car_days_tweened = tweened(car_days, TWEENED_OPTIONS)
+	let rail_days_tweened = tweened(0, TWEENED_OPTIONS)
+	let bus_days_tweened = tweened(0, TWEENED_OPTIONS)
+	let car_days_tweened = tweened(
+		1, // Avoid blinking on page load
+		TWEENED_OPTIONS
+	)
 
 	$: $rail_days_tweened = rail_days
 	$: $bus_days_tweened = bus_days
