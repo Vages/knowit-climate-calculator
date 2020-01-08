@@ -6,10 +6,13 @@
 	const MAX_VACATION_DAYS = 25
 	const MAX_DAYS_EVERY_FOUR_WEEKS = 20
 
-	let days_in_office_every_four_weeks = 20
+	let planned_home_office_days = 0
+
+	$: days_in_office_every_four_weeks =
+		MAX_DAYS_EVERY_FOUR_WEEKS - planned_home_office_days
 
 	$: in_office_ratio =
-			days_in_office_every_four_weeks / MAX_DAYS_EVERY_FOUR_WEEKS
+		days_in_office_every_four_weeks / MAX_DAYS_EVERY_FOUR_WEEKS
 
 	let months_without_motorized_vehicles = 3
 	$: unmotorized_ratio = months_without_motorized_vehicles / 12
@@ -39,10 +42,10 @@
 	$: car_ratio = car_days / days_in_office_every_four_weeks
 
 	$: actual_working_days =
-			MAX_WORK_DAYS - used_vacation_days - unplanned_absence_days
+		MAX_WORK_DAYS - used_vacation_days - unplanned_absence_days
 	$: total_days_in_office = Math.round(actual_working_days * in_office_ratio)
 	$: kilometers_traveled =
-			total_days_in_office * 2 * kilometers_from_home_to_work
+		total_days_in_office * 2 * kilometers_from_home_to_work
 
 	let unmotorized_kilometers, rail_kilometers, bus_kilometers, car_kilometers
 	$: unmotorized_kilometers = kilometers_traveled * unmotorized_ratio
@@ -53,8 +56,8 @@
 	$: car_kilometers = motorized_kilometers * car_ratio
 
 	let unmotorized_kilometers_tweened = tweened(
-			unmotorized_kilometers,
-			TWEENED_OPTIONS
+		unmotorized_kilometers,
+		TWEENED_OPTIONS
 	)
 	let rail_kilometers_tweened = tweened(rail_kilometers, TWEENED_OPTIONS)
 	let bus_kilometers_tweened = tweened(bus_kilometers, TWEENED_OPTIONS)
@@ -180,7 +183,7 @@
 	}
 
 	.results {
-		margin-top: 4rem;
+		margin: 4rem 0;
 	}
 
 	footer {
@@ -190,101 +193,111 @@
 
 <div class="background">
 	<div class="content">
-		<h1>Mellom hjemme og jobb: Kilometerfordeling</h1>
+		<h1>Utslipp til og fra kontoret</h1>
 		Denne kalkulatoren gjør det lettere å fylle ut første side av Knowits
 		klimaundersøkelse.
 		<h2>Spørsmål</h2>
 		<h3>Grunnleggende</h3>
 		<div class="two_column">
 			<label for="home_work_distance">
-				Kilometer fra hjem til jobb (bruk «gange» mellom de to adressene på
-				Google Maps)
+				<strong>Kilometer fra hjem til jobb.</strong>
+				Bruk «gange» mellom de to adressene på Google Maps
 			</label>
 			<div>
 				<input
-						id="home_work_distance"
-						type="number"
-						bind:value={kilometers_from_home_to_work}
-						step="0.1" />
+					id="home_work_distance"
+					type="number"
+					bind:value={kilometers_from_home_to_work}
+					step="0.1" />
 			</div>
 
 			<div>
 				<span class="dot unmotorized" />
 				<label for="walk_bike_months">
-					Måneder i året der du gikk eller syklet alle dager
+					<strong>
+						Måneder i året der du gikk eller syklet
+						<em>alle</em>
+						arbeidsdager
+					</strong>
 				</label>
 			</div>
 			<div>
 				<span class="slider-display">{months_without_motorized_vehicles}</span>
 				<input
-						id="walk_bike_months"
-						type="range"
-						min="0"
-						max="12"
-						bind:value={months_without_motorized_vehicles}
-						step="1" />
+					id="walk_bike_months"
+					type="range"
+					min="0"
+					max="12"
+					bind:value={months_without_motorized_vehicles}
+					step="1" />
 			</div>
 
 			<label for="used_vacation_days">
-				Antall feriedager du tok ut (5 uker ferie er 25 dager)
+				<strong>Antall feriedager du tok ut</strong>
+				5 uker ferie er 25 dager.
 			</label>
 			<div>
 				<input
-						id="used_vacation_days"
-						type="number"
-						bind:value={used_vacation_days}
-						step="1"
-						min="0"
-						max="" />
+					id="used_vacation_days"
+					type="number"
+					bind:value={used_vacation_days}
+					step="1"
+					min="0"
+					max="" />
 			</div>
 
 			<label for="unplanned_absence_days">
-				Dager i året du var uforutsett syk eller tok hjemmekontor på kort
-				varsel.
+				<strong>Dager i året du var uplanlagt borte</strong>
+				Sykdom eller hjemmekontor på kort varsel.
 			</label>
 			<div>
 				<input
-						id="unplanned_absence_days"
-						type="number"
-						bind:value={unplanned_absence_days}
-						step="1"
-						min="0" />
+					id="unplanned_absence_days"
+					type="number"
+					bind:value={unplanned_absence_days}
+					step="1"
+					min="0" />
 			</div>
 
 			<label for="days_in_office_every_four_weeks">
-				<strong>Hvor ofte er du på kontoret:</strong>
-				Ut av 20 arbeidsdager (4 uker), hvor mange av dem planlegger du å være
-				på kontoret (kontra hjemmekontor)?
+				<strong>Hvor ofte har du planlagt hjemmekontor?</strong>
+				Ut av 20 arbeidsdager (4 uker), hvor mange av dem har du regelmessig
+				hjemmekontor?
 			</label>
 			<div>
 				<input
-						id="days_in_office_every_four_weeks"
-						type="number"
-						bind:value={days_in_office_every_four_weeks}
-						step="1"
-						min="0"
-						max="20" />
+					id="days_in_office_every_four_weeks"
+					type="number"
+					bind:value={planned_home_office_days}
+					step="1"
+					min="0"
+					max="20" />
 			</div>
 		</div>
 
 		<h3>Fordeling av kontordager</h3>
 		<p>
-			Du oppgir at du planlegger å bruke {days_in_office_every_four_weeks} av {MAX_DAYS_EVERY_FOUR_WEEKS}
-			arbeidsdager på kontoret innenfor 4 uker. Gitt at du ikke må ta ut noe
-			uplanlagt fravær, hvordan fordeler dagene seg på ulike reisemidler?
+			Fordi du oppgir at du gjennomsnittlig bruker {planned_home_office_days} av
+			{MAX_DAYS_EVERY_FOUR_WEEKS} dager på hjemmekontor, regner vi med du bruker
+			{days_in_office_every_four_weeks} av {MAX_DAYS_EVERY_FOUR_WEEKS} dager på
+			kontoret.
+			<strong>
+				Gitt at du ikke må ta ut noe uplanlagt fravær og ikke går/sykler til
+				jobb, hvordan fordeler dagene dine seg på ulike reisemidler?
+			</strong>
 		</p>
 		<p>
 			<em>
 				Tips 1: Hvis du ikke bytter reisemiddel fra dag til dag, men bytter
-				reisemiddel underveis i reisen, kan du heller bruke sliderne til å
+				reisemiddel underveis i reisen, kan du heller bruke skyveknappene til å
 				justere forholdet mellom reisemidlene.
 			</em>
 		</p>
 		<p>
 			<em>
-				Tips 2: Hvis du går deler av strekningen, bare juster ned «Kilometer fra
-				hjem til jobb» tilsvarende gåavstanden; gange har et neglisjerbart
-				klimagassutslipp.
+				Tips 2: Hvis du går deler av strekningen og ikke vil ta med gåavstanden
+				i beregningen, juster ned «Kilometer fra hjem til jobb» tilsvarende
+				gåavstanden (fordi gange har et neglisjerbart klimaavtrykk).
 			</em>
 		</p>
 
@@ -308,12 +321,12 @@
 			<div>
 				<span class="slider-display">{rail_days}</span>
 				<input
-						id="tram_days"
-						type="range"
-						min="0"
-						max={days_in_office_every_four_weeks - bus_days}
-						bind:value={rail_days}
-						step="1" />
+					id="tram_days"
+					type="range"
+					min="0"
+					max={days_in_office_every_four_weeks - bus_days}
+					bind:value={rail_days}
+					step="1" />
 			</div>
 
 			<div>
@@ -324,12 +337,12 @@
 
 				<span class="slider-display">{bus_days}</span>
 				<input
-						id="bus_days"
-						type="range"
-						min="0"
-						max={days_in_office_every_four_weeks - rail_days}
-						bind:value={bus_days}
-						step="1" />
+					id="bus_days"
+					type="range"
+					min="0"
+					max={days_in_office_every_four_weeks - rail_days}
+					bind:value={bus_days}
+					step="1" />
 			</div>
 			<div>
 				<span class="dot car" />
@@ -346,8 +359,8 @@
 			<div class="ratio_display">
 				{#if $unmotorized_kilometers_tweened}
 					<div
-							class="unmotorized"
-							style="flex-grow: {$unmotorized_kilometers_tweened}">
+						class="unmotorized"
+						style="flex-grow: {$unmotorized_kilometers_tweened}">
 						Gå/sykle
 					</div>
 				{/if}
@@ -392,16 +405,25 @@
 			</div>
 		</div>
 		<footer>
-			Lagd med ❤️ i
-			<a href="https://svelte.dev/">Svelte</a>
-			av
-			<a href="https://github.com/Vages">Eirik Vågeskar.</a>
-			Du kan
-			<a
+			<p>
+				Lagd med ❤️ i
+				<a href="https://svelte.dev/">Svelte</a>
+				av
+				<a href="https://github.com/Vages">Eirik Vågeskar.</a>
+				Du kan
+				<a
 					href="https://svelte.dev/repl/3fc04af22c8444f4a96393fe68b9ae83?version=3.16.7">
-				sjekke ut koden selv,
-			</a>
-			om du vil. Takk til Birgitte Rishatt for hjelp med fargevalg.
+					fikle med koden selv
+				</a>
+				om du vil. Takk til Birgitte Rishatt for hjelp med fargevalg.
+			</p>
+			<p>
+				Hvis du jobber i Objectnet og synes Svelte er gøy, kan du bli med i
+				Slack gruppen #guild-svelte (send en
+				<a href="mailto:eirik.vageskar@knowit.no">e-post til Eirik</a>
+				om du ikke jobber i Objectnet, så legger han deg til). Og om du synes
+				klimaarbeid er gøy, kan du også bli med i #miljøgruppa.
+			</p>
 		</footer>
 	</div>
 </div>
