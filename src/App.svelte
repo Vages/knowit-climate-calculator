@@ -70,6 +70,18 @@
 	$: $rail_kilometers_tweened = rail_kilometers
 	$: $bus_kilometers_tweened = bus_kilometers
 	$: $car_kilometers_tweened = car_kilometers
+
+	$: (() => {
+		// Prevent a negative amount of days if user adjusts number of days in home office
+		if (rail_days + bus_days > days_in_office_every_four_weeks) {
+			if (rail_days) {
+				rail_days = days_in_office_every_four_weeks - bus_days
+			}
+			if (bus_days) {
+				bus_days = days_in_office_every_four_weeks - rail_days
+			}
+		}
+	})()
 </script>
 
 <style>
