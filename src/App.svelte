@@ -421,7 +421,7 @@
 		</div>
 		<footer>
 			<p>
-				Lagd med ❤️ i
+				Laget med ❤️ i
 				<a href="https://svelte.dev/">Svelte</a>
 				av
 				<a href="https://github.com/Vages">Eirik Vågeskar.</a>
