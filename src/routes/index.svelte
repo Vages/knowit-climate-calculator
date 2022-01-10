@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { tweened } from "svelte/motion";
   import { cubicOut } from "svelte/easing";
 
@@ -18,37 +18,35 @@
   $: daysInOfficeEveryFourWeeks =
     MAX_DAYS_EVERY_FOUR_WEEKS - plannedHomeOfficeDays;
 
-  $: inOfficeRatio =
-    daysInOfficeEveryFourWeeks / MAX_DAYS_EVERY_FOUR_WEEKS;
+  $: inOfficeRatio = daysInOfficeEveryFourWeeks / MAX_DAYS_EVERY_FOUR_WEEKS;
 
   let unplannedAbsenceDays = 0;
 
-  let railDays = 0;
-  let busDays = 0;
+  let days = {
+    rail: 0,
+    bus: 0,
+    car: 0,
+  };
+  $: days.car = daysInOfficeEveryFourWeeks - days.rail - days.bus;
 
   const TWEENED_OPTIONS = { easing: cubicOut };
 
-  $: carDays = daysInOfficeEveryFourWeeks - railDays - busDays;
   let railDaysTweened = tweened(0, TWEENED_OPTIONS);
   let busDaysTweened = tweened(0, TWEENED_OPTIONS);
-  let carDaysTweened = tweened(
-    1, // Avoid blinking on page load
-    TWEENED_OPTIONS
-  );
+  let carDaysTweened = tweened(1, TWEENED_OPTIONS);
 
-  $: $railDaysTweened = railDays;
-  $: $busDaysTweened = busDays;
-  $: $carDaysTweened = carDays;
+  $: $railDaysTweened = days.rail;
+  $: $busDaysTweened = days.bus;
+  $: $carDaysTweened = days.car;
 
-  $: railRatio = railDays / daysInOfficeEveryFourWeeks;
-  $: busRatio = busDays / daysInOfficeEveryFourWeeks;
-  $: carRatio = carDays / daysInOfficeEveryFourWeeks;
+  $: railRatio = days.rail / daysInOfficeEveryFourWeeks;
+  $: busRatio = days.bus / daysInOfficeEveryFourWeeks;
+  $: carRatio = days.car / daysInOfficeEveryFourWeeks;
 
   $: actualWorkingDays =
     MAX_WORK_DAYS - usedVacationDays - unplannedAbsenceDays;
   $: totalDaysInOffice = Math.round(actualWorkingDays * inOfficeRatio);
-  $: kilometersTraveled =
-    totalDaysInOffice * 2 * kilometersFromHomeToWork;
+  $: kilometersTraveled = totalDaysInOffice * 2 * kilometersFromHomeToWork;
 
   $: unmotorizedKilometers = kilometersTraveled * unmotorizedRatio;
   $: motorizedKilometers = kilometersTraveled - unmotorizedKilometers;
@@ -71,13 +69,12 @@
   $: $carKilometersTweened = carKilometers;
 
   $: (() => {
-    // Prevent a negative amount of days if user adjusts number of days in home office
-    if (railDays + busDays > daysInOfficeEveryFourWeeks) {
-      if (railDays) {
-        railDays = daysInOfficeEveryFourWeeks - busDays;
+    if (days.rail + days.bus > daysInOfficeEveryFourWeeks) {
+      if (days.rail) {
+        days.rail = daysInOfficeEveryFourWeeks - days.bus;
       }
-      if (busDays) {
-        busDays = daysInOfficeEveryFourWeeks - railDays;
+      if (days.bus) {
+        days.bus = daysInOfficeEveryFourWeeks - days.rail;
       }
     }
   })();
@@ -172,9 +169,9 @@
 
     <h3>Fordeling av kontordager</h3>
     <p>
-      Fordi du oppgir at du gjennomsnittlig bruker {plannedHomeOfficeDays} av
-      {MAX_DAYS_EVERY_FOUR_WEEKS} dager på hjemmekontor, regner vi med du bruker
-      {daysInOfficeEveryFourWeeks} av {MAX_DAYS_EVERY_FOUR_WEEKS} dager på kontoret.
+      Fordi du oppgir at du gjennomsnittlig bruker {plannedHomeOfficeDays} av {MAX_DAYS_EVERY_FOUR_WEEKS}
+      dager på hjemmekontor, regner vi med du bruker {daysInOfficeEveryFourWeeks}
+      av {MAX_DAYS_EVERY_FOUR_WEEKS} dager på kontoret.
       <strong>
         Gitt at du ikke må ta ut noe uplanlagt fravær og ikke går/sykler til
         jobb, hvordan fordeler dagene dine seg på ulike reisemidler?
@@ -213,13 +210,13 @@
         <label for="tram_days">Tog/trikk/Bybane/T-bane</label>
       </div>
       <div>
-        <span class="slider-display">{railDays}</span>
+        <span class="slider-display">{days.rail}</span>
         <input
           id="tram_days"
           type="range"
           min="0"
-          max={daysInOfficeEveryFourWeeks - busDays}
-          bind:value={railDays}
+          max={daysInOfficeEveryFourWeeks - days.bus}
+          bind:value={days.rail}
           step="1"
         />
       </div>
@@ -229,13 +226,13 @@
         <label for="bus_days">Buss</label>
       </div>
       <div>
-        <span class="slider-display">{busDays}</span>
+        <span class="slider-display">{days.bus}</span>
         <input
           id="bus_days"
           type="range"
           min="0"
-          max={daysInOfficeEveryFourWeeks - railDays}
-          bind:value={busDays}
+          max={daysInOfficeEveryFourWeeks - days.rail}
+          bind:value={days.bus}
           step="1"
         />
       </div>
@@ -243,7 +240,7 @@
         <span class="dot car" />
         <span>Bildager</span>
       </div>
-      <span>{carDays}</span>
+      <span>{days.car}</span>
     </div>
 
     <div class="results">
@@ -268,14 +265,10 @@
           </div>
         {/if}
         {#if $busKilometersTweened}
-          <div class="bus" style="flex-grow: {$busKilometersTweened}">
-            Buss
-          </div>
+          <div class="bus" style="flex-grow: {$busKilometersTweened}">Buss</div>
         {/if}
         {#if $carKilometersTweened}
-          <div class="car" style="flex-grow: {$carKilometersTweened}">
-            Bil
-          </div>
+          <div class="car" style="flex-grow: {$carKilometersTweened}">Bil</div>
         {/if}
       </div>
 
