@@ -59,19 +59,6 @@
     <h2>Spørsmål</h2>
     <h3>Grunnleggende</h3>
     <div class="two_column">
-      <label for="home_work_distance">
-        <strong>Kilometer fra hjem til jobb.</strong>
-        Bruk «gange» mellom de to adressene på Google Maps
-      </label>
-      <div>
-        <input
-          id="home_work_distance"
-          type="number"
-          bind:value={kilometersFromHomeToWork}
-          step="0.1"
-        />
-      </div>
-
       <div>
         <span class="dot unmotorized" />
         <label for="walk_bike_months">
@@ -218,6 +205,21 @@
 
     <div class="results">
       <h2>Resultater</h2>
+      <div class="two_column">
+        <label for="home_work_distance">
+          <strong>Kilometer fra hjem til jobb.</strong>
+          Bruk «gange» mellom de to adressene på Google Maps
+        </label>
+        <div>
+          <input
+            id="home_work_distance"
+            type="number"
+            bind:value={kilometersFromHomeToWork}
+            step="0.1"
+          />
+        </div>
+      </div>
+
       I fjor hadde du totalt {actualWorkingDays} arbeidsdager ut av {MAX_WORK_DAYS}
       mulige. Av disse var {totalDaysInOffice} på kontoret, og medførte {Math.round(
         kilometersTraveled
