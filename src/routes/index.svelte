@@ -1,39 +1,34 @@
 <script lang="ts">
-  const MAX_WORK_DAYS = 249;
+  let monthsInOffice = 3;
   const NORMAL_VACATION_DAYS = 25;
+  let vacationDays = NORMAL_VACATION_DAYS;
+  let otherAbsence = 0;
+
   const WORKDAYS_IN_FOUR_WEEKS = 20;
-
-  let kilometersFromHomeToWork = 2.6;
-
-  let monthsWithoutMotorizedTravel = 3;
-
-  let usedVacationDays = NORMAL_VACATION_DAYS;
-
-  let unplannedAbsenceDays = 0;
-
   let days = {
-    unmotorized: 20,
+    unmotorized: WORKDAYS_IN_FOUR_WEEKS,
     rail: 0,
     bus: 0,
     car: 0,
   };
-  $: motorizedDaysOutOfTwentyInOffice = days.car + days.bus + days.rail;
-
   $: days.unmotorized =
     WORKDAYS_IN_FOUR_WEEKS - days.rail - days.bus - days.car;
 
-  $: inOfficeRatio = motorizedDaysOutOfTwentyInOffice / WORKDAYS_IN_FOUR_WEEKS;
+  let kilometersFromHomeToWork = 2.6;
 
-  $: actualWorkingDays =
-    MAX_WORK_DAYS - usedVacationDays - unplannedAbsenceDays;
-  $: totalDaysInOffice = Math.round(actualWorkingDays * inOfficeRatio);
+  const MAX_WORK_DAYS = 249;
 
-  $: kilometersTraveled = totalDaysInOffice * 2 * kilometersFromHomeToWork;
+  $: daysAtWork = MAX_WORK_DAYS - vacationDays - otherAbsence;
 
-  $: unmotorizedRatio = monthsWithoutMotorizedTravel / 12;
+  $: motorizedDaysOutOfTwentyInOffice = days.car + days.bus + days.rail;
 
-  $: unmotorizedKilometers = kilometersTraveled * unmotorizedRatio;
-  $: motorizedKilometers = kilometersTraveled - unmotorizedKilometers;
+  $: totalDaysInOffice = Math.round(
+    daysAtWork *
+      (monthsInOffice / 12) *
+      (motorizedDaysOutOfTwentyInOffice / WORKDAYS_IN_FOUR_WEEKS)
+  );
+
+  $: motorizedKilometers = totalDaysInOffice * 2 * kilometersFromHomeToWork;
 
   $: kilometers = {
     rail:
@@ -53,19 +48,16 @@
     <h3>Tid borte fra kontoret</h3>
     <div class="two_column">
       <label for="walk_bike_months">
-        <strong>
-          Måneder i året der du hadde hjemmekontor eller gikk og syklet til
-          kontoret alle dager
-        </strong>
+        <strong> Måneder der du var på kontoret </strong>
       </label>
       <div>
-        <span class="slider-display">{monthsWithoutMotorizedTravel}</span>
+        <span class="slider-display">{monthsInOffice}</span>
         <input
           id="walk_bike_months"
           type="range"
           min="0"
           max="12"
-          bind:value={monthsWithoutMotorizedTravel}
+          bind:value={monthsInOffice}
           step="1"
         />
       </div>
@@ -78,7 +70,7 @@
         <input
           id="used_vacation_days"
           type="number"
-          bind:value={usedVacationDays}
+          bind:value={vacationDays}
           step="1"
           min="0"
           max=""
@@ -93,7 +85,7 @@
         <input
           id="unplanned_absence_days"
           type="number"
-          bind:value={unplannedAbsenceDays}
+          bind:value={otherAbsence}
           step="1"
           min="0"
         />
@@ -192,7 +184,7 @@
         </div>
       </div>
 
-      I fjor hadde du totalt {actualWorkingDays} arbeidsdager ut av {MAX_WORK_DAYS}
+      I fjor hadde du totalt {daysAtWork} arbeidsdager ut av {MAX_WORK_DAYS}
       mulige. Av disse var {totalDaysInOffice} på kontoret, og medførte {Math.round(
         motorizedKilometers
       )}
