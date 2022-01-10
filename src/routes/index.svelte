@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { tweened } from "svelte/motion";
-  import { cubicOut } from "svelte/easing";
-
   const MAX_WORK_DAYS = 249;
   const MAX_VACATION_DAYS = 25;
   const MAX_DAYS_EVERY_FOUR_WEEKS = 20;
@@ -29,16 +26,6 @@
   };
   $: days.car = daysInOfficeEveryFourWeeks - days.rail - days.bus;
 
-  const TWEENED_OPTIONS = { easing: cubicOut };
-
-  let railDaysTweened = tweened(0, TWEENED_OPTIONS);
-  let busDaysTweened = tweened(0, TWEENED_OPTIONS);
-  let carDaysTweened = tweened(1, TWEENED_OPTIONS);
-
-  $: $railDaysTweened = days.rail;
-  $: $busDaysTweened = days.bus;
-  $: $carDaysTweened = days.car;
-
   $: railRatio = days.rail / daysInOfficeEveryFourWeeks;
   $: busRatio = days.bus / daysInOfficeEveryFourWeeks;
   $: carRatio = days.car / daysInOfficeEveryFourWeeks;
@@ -54,19 +41,6 @@
   $: railKilometers = motorizedKilometers * railRatio;
   $: busKilometers = motorizedKilometers * busRatio;
   $: carKilometers = motorizedKilometers * carRatio;
-
-  let unmotorizedKilometersTweened = tweened(
-    unmotorizedKilometers,
-    TWEENED_OPTIONS
-  );
-  let railKilometersTweened = tweened(railKilometers, TWEENED_OPTIONS);
-  let busKilometersTweened = tweened(busKilometers, TWEENED_OPTIONS);
-  let carKilometersTweened = tweened(carKilometers, TWEENED_OPTIONS);
-
-  $: $unmotorizedKilometersTweened = unmotorizedKilometers;
-  $: $railKilometersTweened = railKilometers;
-  $: $busKilometersTweened = busKilometers;
-  $: $carKilometersTweened = carKilometers;
 
   $: (() => {
     if (days.rail + days.bus > daysInOfficeEveryFourWeeks) {
@@ -193,14 +167,14 @@
     </p>
 
     <div class="ratio_display">
-      {#if $railDaysTweened}
-        <div class="rail" style="flex-grow: {$railDaysTweened}">Skinner</div>
+      {#if days.rail}
+        <div class="rail" style="flex-grow: {days.rail}">Skinner</div>
       {/if}
-      {#if $busDaysTweened}
-        <div class="bus" style="flex-grow: {$busDaysTweened}">Buss</div>
+      {#if days.bus}
+        <div class="bus" style="flex-grow: {days.bus}">Buss</div>
       {/if}
-      {#if $carDaysTweened}
-        <div class="car" style="flex-grow: {$carDaysTweened}">Bil</div>
+      {#if days.car}
+        <div class="car" style="flex-grow: {days.car}">Bil</div>
       {/if}
     </div>
 
@@ -251,24 +225,19 @@
       )}
       km reise. Disse fordelte seg som følger:
       <div class="ratio_display">
-        {#if $unmotorizedKilometersTweened}
-          <div
-            class="unmotorized"
-            style="flex-grow: {$unmotorizedKilometersTweened}"
-          >
+        {#if unmotorizedKilometers}
+          <div class="unmotorized" style="flex-grow: {unmotorizedKilometers}">
             Gå/sykle
           </div>
         {/if}
-        {#if $railKilometersTweened}
-          <div class="rail" style="flex-grow: {$railKilometersTweened}">
-            Skinner
-          </div>
+        {#if railKilometers}
+          <div class="rail" style="flex-grow: {railKilometers}">Skinner</div>
         {/if}
-        {#if $busKilometersTweened}
-          <div class="bus" style="flex-grow: {$busKilometersTweened}">Buss</div>
+        {#if busKilometers}
+          <div class="bus" style="flex-grow: {busKilometers}">Buss</div>
         {/if}
-        {#if $carKilometersTweened}
-          <div class="car" style="flex-grow: {$carKilometersTweened}">Bil</div>
+        {#if carKilometers}
+          <div class="car" style="flex-grow: {carKilometers}">Bil</div>
         {/if}
       </div>
 
