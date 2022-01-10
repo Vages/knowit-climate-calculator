@@ -1,21 +1,21 @@
 <script lang="ts">
   const MAX_WORK_DAYS = 249;
-  const MAX_VACATION_DAYS = 25;
-  const MAX_DAYS_EVERY_FOUR_WEEKS = 20;
+  const NORMAL_VACATION_DAYS = 25;
+  const WORKDAYS_IN_FOUR_WEEKS = 20;
 
   let kilometersFromHomeToWork = 2.6;
 
-  let monthsWithoutMotorizedVehicles = 3;
-  $: unmotorizedRatio = monthsWithoutMotorizedVehicles / 12;
+  let monthsWithoutMotorizedTravel = 3;
+  $: unmotorizedRatio = monthsWithoutMotorizedTravel / 12;
 
-  let usedVacationDays = MAX_VACATION_DAYS;
+  let usedVacationDays = NORMAL_VACATION_DAYS;
 
-  let plannedHomeOfficeDays = 0;
+  let unmotorizedDaysInTwentyMotorizedDays = 0;
 
-  $: daysInOfficeEveryFourWeeks =
-    MAX_DAYS_EVERY_FOUR_WEEKS - plannedHomeOfficeDays;
+  $: motorizedDaysOutOfTwentyInOffice =
+    WORKDAYS_IN_FOUR_WEEKS - unmotorizedDaysInTwentyMotorizedDays;
 
-  $: inOfficeRatio = daysInOfficeEveryFourWeeks / MAX_DAYS_EVERY_FOUR_WEEKS;
+  $: inOfficeRatio = motorizedDaysOutOfTwentyInOffice / WORKDAYS_IN_FOUR_WEEKS;
 
   let unplannedAbsenceDays = 0;
 
@@ -24,11 +24,7 @@
     bus: 0,
     car: 0,
   };
-  $: days.car = daysInOfficeEveryFourWeeks - days.rail - days.bus;
-
-  $: railRatio = days.rail / daysInOfficeEveryFourWeeks;
-  $: busRatio = days.bus / daysInOfficeEveryFourWeeks;
-  $: carRatio = days.car / daysInOfficeEveryFourWeeks;
+  $: days.car = motorizedDaysOutOfTwentyInOffice - days.rail - days.bus;
 
   $: actualWorkingDays =
     MAX_WORK_DAYS - usedVacationDays - unplannedAbsenceDays;
@@ -38,17 +34,20 @@
   $: unmotorizedKilometers = kilometersTraveled * unmotorizedRatio;
   $: motorizedKilometers = kilometersTraveled - unmotorizedKilometers;
 
-  $: railKilometers = motorizedKilometers * railRatio;
-  $: busKilometers = motorizedKilometers * busRatio;
-  $: carKilometers = motorizedKilometers * carRatio;
+  $: railKilometers =
+    motorizedKilometers * (days.rail / motorizedDaysOutOfTwentyInOffice);
+  $: busKilometers =
+    motorizedKilometers * (days.bus / motorizedDaysOutOfTwentyInOffice);
+  $: carKilometers =
+    motorizedKilometers * (days.car / motorizedDaysOutOfTwentyInOffice);
 
   $: (() => {
-    if (days.rail + days.bus > daysInOfficeEveryFourWeeks) {
+    if (days.rail + days.bus > motorizedDaysOutOfTwentyInOffice) {
       if (days.rail) {
-        days.rail = daysInOfficeEveryFourWeeks - days.bus;
+        days.rail = motorizedDaysOutOfTwentyInOffice - days.bus;
       }
       if (days.bus) {
-        days.bus = daysInOfficeEveryFourWeeks - days.rail;
+        days.bus = motorizedDaysOutOfTwentyInOffice - days.rail;
       }
     }
   })();
@@ -85,13 +84,13 @@
         </label>
       </div>
       <div>
-        <span class="slider-display">{monthsWithoutMotorizedVehicles}</span>
+        <span class="slider-display">{monthsWithoutMotorizedTravel}</span>
         <input
           id="walk_bike_months"
           type="range"
           min="0"
           max="12"
-          bind:value={monthsWithoutMotorizedVehicles}
+          bind:value={monthsWithoutMotorizedTravel}
           step="1"
         />
       </div>
@@ -119,7 +118,7 @@
         <input
           id="days_in_office_every_four_weeks"
           type="number"
-          bind:value={plannedHomeOfficeDays}
+          bind:value={unmotorizedDaysInTwentyMotorizedDays}
           step="1"
           min="0"
           max="20"
@@ -143,9 +142,10 @@
 
     <h3>Fordeling av kontordager</h3>
     <p>
-      Fordi du oppgir at du gjennomsnittlig bruker {plannedHomeOfficeDays} av {MAX_DAYS_EVERY_FOUR_WEEKS}
-      dager på hjemmekontor, regner vi med du bruker {daysInOfficeEveryFourWeeks}
-      av {MAX_DAYS_EVERY_FOUR_WEEKS} dager på kontoret.
+      Fordi du oppgir at du gjennomsnittlig bruker {unmotorizedDaysInTwentyMotorizedDays}
+      av {WORKDAYS_IN_FOUR_WEEKS}
+      dager på hjemmekontor, regner vi med du bruker {motorizedDaysOutOfTwentyInOffice}
+      av {WORKDAYS_IN_FOUR_WEEKS} dager på kontoret.
       <strong>
         Gitt at du ikke må ta ut noe uplanlagt fravær og ikke går/sykler til
         jobb, hvordan fordeler dagene dine seg på ulike reisemidler?
@@ -189,7 +189,7 @@
           id="tram_days"
           type="range"
           min="0"
-          max={daysInOfficeEveryFourWeeks - days.bus}
+          max={motorizedDaysOutOfTwentyInOffice - days.bus}
           bind:value={days.rail}
           step="1"
         />
@@ -205,7 +205,7 @@
           id="bus_days"
           type="range"
           min="0"
-          max={daysInOfficeEveryFourWeeks - days.rail}
+          max={motorizedDaysOutOfTwentyInOffice - days.rail}
           bind:value={days.bus}
           step="1"
         />
