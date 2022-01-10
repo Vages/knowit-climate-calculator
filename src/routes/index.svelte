@@ -34,12 +34,11 @@
   $: unmotorizedKilometers = kilometersTraveled * unmotorizedRatio;
   $: motorizedKilometers = kilometersTraveled - unmotorizedKilometers;
 
-  $: railKilometers =
-    motorizedKilometers * (days.rail / motorizedDaysOutOfTwentyInOffice);
-  $: busKilometers =
-    motorizedKilometers * (days.bus / motorizedDaysOutOfTwentyInOffice);
-  $: carKilometers =
-    motorizedKilometers * (days.car / motorizedDaysOutOfTwentyInOffice);
+  $: kilometers = {
+    rail: motorizedKilometers * (days.rail / motorizedDaysOutOfTwentyInOffice),
+    bus: motorizedKilometers * (days.bus / motorizedDaysOutOfTwentyInOffice),
+    car: motorizedKilometers * (days.car / motorizedDaysOutOfTwentyInOffice),
+  };
 
   $: (() => {
     if (days.rail + days.bus > motorizedDaysOutOfTwentyInOffice) {
@@ -230,14 +229,14 @@
             Gå/sykle
           </div>
         {/if}
-        {#if railKilometers}
-          <div class="rail" style="flex-grow: {railKilometers}">Skinner</div>
+        {#if kilometers.rail}
+          <div class="rail" style="flex-grow: {kilometers.rail}">Skinner</div>
         {/if}
-        {#if busKilometers}
-          <div class="bus" style="flex-grow: {busKilometers}">Buss</div>
+        {#if kilometers.bus}
+          <div class="bus" style="flex-grow: {kilometers.bus}">Buss</div>
         {/if}
-        {#if carKilometers}
-          <div class="car" style="flex-grow: {carKilometers}">Bil</div>
+        {#if kilometers.car}
+          <div class="car" style="flex-grow: {kilometers.car}">Bil</div>
         {/if}
       </div>
 
@@ -251,17 +250,17 @@
           <span class="dot rail" />
           Tog/trikk/bybane/T-bane
         </div>
-        <div>{Math.round(railKilometers)} km</div>
+        <div>{Math.round(kilometers.rail)} km</div>
         <div>
           <span class="dot bus" />
           Buss
         </div>
-        <div>{Math.round(busKilometers)} km</div>
+        <div>{Math.round(kilometers.bus)} km</div>
         <div>
           <span class="dot car" />
           Bil (uspesifisert type)
         </div>
-        <div>{Math.round(carKilometers)} km</div>
+        <div>{Math.round(kilometers.car)} km</div>
       </div>
     </div>
     <footer>
