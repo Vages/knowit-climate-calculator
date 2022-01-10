@@ -6,50 +6,43 @@
   let kilometersFromHomeToWork = 2.6;
 
   let monthsWithoutMotorizedTravel = 3;
-  $: unmotorizedRatio = monthsWithoutMotorizedTravel / 12;
 
   let usedVacationDays = NORMAL_VACATION_DAYS;
-
-  let unmotorizedDaysInTwentyMotorizedDays = 0;
-
-  $: motorizedDaysOutOfTwentyInOffice =
-    WORKDAYS_IN_FOUR_WEEKS - unmotorizedDaysInTwentyMotorizedDays;
-
-  $: inOfficeRatio = motorizedDaysOutOfTwentyInOffice / WORKDAYS_IN_FOUR_WEEKS;
 
   let unplannedAbsenceDays = 0;
 
   let days = {
+    unmotorized: 20,
     rail: 0,
     bus: 0,
     car: 0,
   };
-  $: days.car = motorizedDaysOutOfTwentyInOffice - days.rail - days.bus;
+  $: motorizedDaysOutOfTwentyInOffice = days.car + days.bus + days.rail;
+
+  $: days.unmotorized =
+    WORKDAYS_IN_FOUR_WEEKS - days.rail - days.bus - days.car;
+
+  $: inOfficeRatio = motorizedDaysOutOfTwentyInOffice / WORKDAYS_IN_FOUR_WEEKS;
 
   $: actualWorkingDays =
     MAX_WORK_DAYS - usedVacationDays - unplannedAbsenceDays;
   $: totalDaysInOffice = Math.round(actualWorkingDays * inOfficeRatio);
+
   $: kilometersTraveled = totalDaysInOffice * 2 * kilometersFromHomeToWork;
+
+  $: unmotorizedRatio = monthsWithoutMotorizedTravel / 12;
 
   $: unmotorizedKilometers = kilometersTraveled * unmotorizedRatio;
   $: motorizedKilometers = kilometersTraveled - unmotorizedKilometers;
 
   $: kilometers = {
-    rail: motorizedKilometers * (days.rail / motorizedDaysOutOfTwentyInOffice),
-    bus: motorizedKilometers * (days.bus / motorizedDaysOutOfTwentyInOffice),
-    car: motorizedKilometers * (days.car / motorizedDaysOutOfTwentyInOffice),
+    rail:
+      motorizedKilometers * (days.rail / motorizedDaysOutOfTwentyInOffice) || 0,
+    bus:
+      motorizedKilometers * (days.bus / motorizedDaysOutOfTwentyInOffice) || 0,
+    car:
+      motorizedKilometers * (days.car / motorizedDaysOutOfTwentyInOffice) || 0,
   };
-
-  $: (() => {
-    if (days.rail + days.bus > motorizedDaysOutOfTwentyInOffice) {
-      if (days.rail) {
-        days.rail = motorizedDaysOutOfTwentyInOffice - days.bus;
-      }
-      if (days.bus) {
-        days.bus = motorizedDaysOutOfTwentyInOffice - days.rail;
-      }
-    }
-  })();
 </script>
 
 <div class="background">
@@ -57,18 +50,14 @@
     <h1>Utslipp til og fra kontoret</h1>
     Denne kalkulatoren gjør det lettere å fylle ut første side av Knowits klimaundersøkelse.
     <h2>Spørsmål</h2>
-    <h3>Grunnleggende</h3>
+    <h3>Tid borte fra kontoret</h3>
     <div class="two_column">
-      <div>
-        <span class="dot unmotorized" />
-        <label for="walk_bike_months">
-          <strong>
-            Måneder i året der du gikk eller syklet
-            <em>alle</em>
-            arbeidsdager.
-          </strong>
-        </label>
-      </div>
+      <label for="walk_bike_months">
+        <strong>
+          Måneder i året der du hadde hjemmekontor eller gikk og syklet til
+          kontoret alle dager
+        </strong>
+      </label>
       <div>
         <span class="slider-display">{monthsWithoutMotorizedTravel}</span>
         <input
@@ -96,21 +85,6 @@
         />
       </div>
 
-      <label for="days_in_office_every_four_weeks">
-        <strong>Hvor ofte har du planlagt hjemmekontor?</strong>
-        Ut av 20 arbeidsdager (4 uker), hvor mange av dem har du regelmessig hjemmekontor?
-      </label>
-      <div>
-        <input
-          id="days_in_office_every_four_weeks"
-          type="number"
-          bind:value={unmotorizedDaysInTwentyMotorizedDays}
-          step="1"
-          min="0"
-          max="20"
-        />
-      </div>
-
       <label for="unplanned_absence_days">
         <strong>Dager i året du var uplanlagt borte.</strong>
         Sykdom eller hjemmekontor på kort varsel.
@@ -126,33 +100,19 @@
       </div>
     </div>
 
-    <h3>Fordeling av kontordager</h3>
+    <h3>Fordeling i månedene du var innom kontoret</h3>
     <p>
-      Fordi du oppgir at du gjennomsnittlig bruker {unmotorizedDaysInTwentyMotorizedDays}
-      av {WORKDAYS_IN_FOUR_WEEKS}
-      dager på hjemmekontor, regner vi med du bruker {motorizedDaysOutOfTwentyInOffice}
-      av {WORKDAYS_IN_FOUR_WEEKS} dager på kontoret.
-      <strong>
-        Gitt at du ikke må ta ut noe uplanlagt fravær og ikke går/sykler til
-        jobb, hvordan fordeler dagene dine seg på ulike reisemidler?
-      </strong>
-    </p>
-    <p>
-      <em>
-        Tips 1: Hvis du ikke bytter reisemiddel fra dag til dag, men bytter
-        reisemiddel underveis i reisen, kan du heller bruke skyveknappene til å
-        justere forholdet mellom reisemidlene.
-      </em>
-    </p>
-    <p>
-      <em>
-        Tips 2: Hvis du går deler av strekningen og ikke vil ta med gåavstanden
-        i beregningen, juster ned «Kilometer fra hjem til jobb» tilsvarende
-        gåavstanden (fordi gange har et neglisjerbart klimaavtrykk).
-      </em>
+      En måned der du var innom kontoret har ca. 20 arbeidsdager. Hvordan
+      fordelte disse seg på ulike motoriserte transportmidler? Vi antar at du
+      gikk, syklet eller var på hjemmekontor de øvrige dagene.
     </p>
 
     <div class="ratio_display">
+      {#if days.unmotorized}
+        <div class="unmotorized" style="flex-grow: {days.unmotorized}">
+          Gå/sykle/hjemmekontor
+        </div>
+      {/if}
       {#if days.rail}
         <div class="rail" style="flex-grow: {days.rail}">Skinner</div>
       {/if}
@@ -166,16 +126,20 @@
 
     <div class="two_column">
       <div>
+        <span class="dot unmotorized" />
+        <span>Gå/sykle/hjemmekontor</span>
+      </div>
+      <span>{days.unmotorized}</span>
+      <div>
         <span class="dot rail" />
         <label for="tram_days">Tog/trikk/Bybane/T-bane</label>
       </div>
       <div>
-        <span class="slider-display">{days.rail}</span>
         <input
           id="tram_days"
-          type="range"
+          type="number"
           min="0"
-          max={motorizedDaysOutOfTwentyInOffice - days.bus}
+          max={WORKDAYS_IN_FOUR_WEEKS - days.bus - days.car}
           bind:value={days.rail}
           step="1"
         />
@@ -186,21 +150,29 @@
         <label for="bus_days">Buss</label>
       </div>
       <div>
-        <span class="slider-display">{days.bus}</span>
         <input
           id="bus_days"
-          type="range"
+          type="number"
           min="0"
-          max={motorizedDaysOutOfTwentyInOffice - days.rail}
+          max={WORKDAYS_IN_FOUR_WEEKS - days.rail - days.car}
           bind:value={days.bus}
           step="1"
         />
       </div>
       <div>
         <span class="dot car" />
-        <span>Bildager</span>
+        <label for="car_days">Bil</label>
       </div>
-      <span>{days.car}</span>
+      <div>
+        <input
+          id="car_days"
+          type="number"
+          min="0"
+          max={WORKDAYS_IN_FOUR_WEEKS - days.rail - days.bus}
+          bind:value={days.car}
+          step="1"
+        />
+      </div>
     </div>
 
     <div class="results">
@@ -222,15 +194,10 @@
 
       I fjor hadde du totalt {actualWorkingDays} arbeidsdager ut av {MAX_WORK_DAYS}
       mulige. Av disse var {totalDaysInOffice} på kontoret, og medførte {Math.round(
-        kilometersTraveled
+        motorizedKilometers
       )}
-      km reise. Disse fordelte seg som følger:
+      km motorisert reise. Disse fordelte seg som følger:
       <div class="ratio_display">
-        {#if unmotorizedKilometers}
-          <div class="unmotorized" style="flex-grow: {unmotorizedKilometers}">
-            Gå/sykle
-          </div>
-        {/if}
         {#if kilometers.rail}
           <div class="rail" style="flex-grow: {kilometers.rail}">Skinner</div>
         {/if}
@@ -243,11 +210,6 @@
       </div>
 
       <div class="two_column">
-        <div>
-          <span class="dot unmotorized" />
-          Gå/sykle
-        </div>
-        <div>{Math.round(unmotorizedKilometers)} km</div>
         <div>
           <span class="dot rail" />
           Tog/trikk/bybane/T-bane
